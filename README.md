@@ -32,15 +32,7 @@ To use the **AwesomePasswordChecker** library, follow these steps:
     mvn clean install
     ```
 
-3. Add the library to your project as a dependency (if using Maven):
 
-    ```xml
-    <dependency>
-        <groupId>org.example</groupId>
-        <artifactId>AwesomePasswordChecker</artifactId>
-        <version>1.0.0</version>
-    </dependency>
-    ```
 
 ## Basic Usage
 
