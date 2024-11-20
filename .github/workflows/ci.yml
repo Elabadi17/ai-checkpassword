@@ -10,6 +10,11 @@ jobs:
   checkstyle:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Java 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'adoptopenjdk'  # or another distribution if needed
 
       - name: Run Checkstyle
         run: mvn checkstyle:check
@@ -18,15 +23,15 @@ jobs:
   unit_tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Java 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'adoptopenjdk'  # or another distribution if needed
+
       - name: Checkout code
         uses: actions/checkout@v4
 
-
-      - name: Run Unit Tests with Jacoco Coverage
+      - name: Run Unit Test
         run: |
           mvn test
-
-
-
-  
-
