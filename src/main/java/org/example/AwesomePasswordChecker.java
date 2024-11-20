@@ -18,10 +18,11 @@ public class AwesomePasswordChecker {
     private static AwesomePasswordChecker instance;
 
     // Liste contenant les centres des clusters
-    private final List<double[]> clusterCenters = new ArrayList<>();
+    public final List<double[]> clusterCenters = new ArrayList<>();
 
     /**
-     * Récupère l'instance unique de la classe en chargeant les centres de clusters depuis un fichier
+     * Récupère l'instance unique de la classe en chargeant les centres de clusters depuis un fichier.
+     *
      * @param file le fichier contenant les données des centres
      * @return l'instance unique de AwesomePasswordChecker
      * @throws IOException si une erreur d'I/O se produit lors de la lecture du fichier
@@ -34,7 +35,8 @@ public class AwesomePasswordChecker {
     }
 
     /**
-     * Récupère l'instance unique de la classe en chargeant les centres de clusters depuis un fichier par défaut
+     * Récupère l'instance unique de la classe en chargeant les centres de clusters depuis un fichier par défaut.
+     *
      * @return l'instance unique de AwesomePasswordChecker
      * @throws IOException si une erreur d'I/O se produit lors de la lecture du fichier
      */
@@ -47,7 +49,8 @@ public class AwesomePasswordChecker {
     }
 
     /**
-     * Constructeur privé qui initialise les centres de clusters à partir d'un InputStream
+     * Constructeur privé qui initialise les centres de clusters à partir d'un InputStream.
+     *
      * @param is l'InputStream contenant les données des centres de clusters
      * @throws IOException si une erreur d'I/O se produit lors de la lecture
      */
@@ -55,19 +58,25 @@ public class AwesomePasswordChecker {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         String line;
         while((line = br.readLine()) != null){
-            String[] values = line.split(";"); // Sépare les valeurs de la ligne
+            String[] values = line.split(","); // Sépare les valeurs de la ligne
             double[] center = new double[values.length];
 
             for (int i = 0; i < values.length; ++i) {
-                center[i] = Double.parseDouble(values[i]);  // Conversion des valeurs en double
-            }
+                try {
+                    // Parse each value as a double
+                    center[i] = Double.parseDouble(values[i].trim());
+                } catch (NumberFormatException e) {
+                    // Handle the exception if the value can't be parsed as a double
+                    System.err.println("Invalid number format: " + values[i]);
+                }            }
             clusterCenters.add(center);
         }
         br.close();
     }
 
     /**
-     * Crée un masque (tableau d'entiers) pour un mot de passe donné
+     * Crée un masque (tableau d'entiers) pour un mot de passe donné.
+     *
      * @param password le mot de passe pour lequel le masque est créé
      * @return un tableau d'entiers représentant le masque
      */
@@ -79,21 +88,21 @@ public class AwesomePasswordChecker {
             char c = password.charAt(i);
             switch (c) {
                 case 'e': case 's': case 'a': case 'i': case 't': case 'n': case 'r': case 'u': case 'o': case 'l':
-                    maskArray[i] = 1; // lettre courante remplacee par 1
+                    maskArray[i] = 1; // lettre courante remplacée par 1
                     break;
                 case 'E': case 'S': case 'A': case 'I': case 'T': case 'N': case 'R': case 'U': case 'O': case 'L':
-                    maskArray[i] = 3; // lettre majuscule courante remplacee par 3
+                    maskArray[i] = 3; // lettre majuscule courante remplacée par 3
                     break;
                 case '>': case '<': case '-': case '?': case '.': case '/': case '!': case '%': case '@': case '&':
-                    maskArray[i] = 6;  // caractères spéciaux remplaces par 6
+                    maskArray[i] = 6;  // caractères spéciaux remplacés par 6
                     break;
                 default:
                     if (Character.isLowerCase(c)) {
-                        maskArray[i] = 2;  // lettre minuscule remplacee par 2
+                        maskArray[i] = 2;  // lettre minuscule remplacée par 2
                     } else if (Character.isUpperCase(c)) {
-                        maskArray[i] = 4;  // lettre majuscule remplacee par 4
+                        maskArray[i] = 4;  // lettre majuscule remplacée par 4
                     } else if (Character.isDigit(c)) {
-                        maskArray[i] = 5;  // chiffre remplace par 5
+                        maskArray[i] = 5;  // chiffre remplacé par 5
                     } else {
                         maskArray[i] = 7;
                     }
@@ -103,7 +112,8 @@ public class AwesomePasswordChecker {
     }
 
     /**
-     * Calcule et retourne la distance minimale entre le masque d'un mot de passe et les centres de clusters
+     * Calcule et retourne la distance minimale entre le masque d'un mot de passe et les centres de clusters.
+     *
      * @param password le mot de passe pour lequel calculer la distance
      * @return la distance minimale
      */
@@ -117,7 +127,8 @@ public class AwesomePasswordChecker {
     }
 
     /**
-     * Calcule la distance euclidienne entre deux tableaux
+     * Calcule la distance euclidienne entre deux tableaux.
+     *
      * @param a tableau d'entiers
      * @param b tableau de doubles
      * @return la distance euclidienne
@@ -131,7 +142,8 @@ public class AwesomePasswordChecker {
     }
 
     /**
-     * Calcule le hash MD5 d'une chaîne de caractères donnée
+     * Calcule le hash MD5 d'une chaîne de caractères donnée.
+     *
      * @param input la chaîne de caractères
      * @return la représentation hexadécimale du hash MD5
      */
@@ -230,9 +242,17 @@ public class AwesomePasswordChecker {
         return md5Hex.toString();
     }
 
-
+    /**
+     * Méthode principale pour démonstration.
+     *
+     * @param args arguments de ligne de commande
+     */
     public static void main(String[] args) {
-        System.out.println("Hello world!");
-        System.out.println(ComputeMD5("123456"));
+        InputStream is = AwesomePasswordChecker.class.getClassLoader().getResourceAsStream("cluster_centers_HAC_aff.csv");
+        if (is == null) {
+            System.out.println("Resource not found!");
+        } else {
+            System.out.println("Resource found!");
+        }
     }
 }
