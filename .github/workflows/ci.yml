@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  # 1. Static Analysis - Checkstyle
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
+
+  # 2. Unit Tests & Coverage (Jacoco)
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+
+
+      - name: Run Unit Tests with Jacoco Coverage
+        run: |
+          mvn test
+
+
+
+  
+
