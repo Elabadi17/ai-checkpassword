@@ -10,11 +10,11 @@ jobs:
   checkstyle:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Java 21
+      - name: Set up Java 21 (Adoptium Temurin)
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'adoptopenjdk'  # or another distribution if needed
+          distribution: 'temurin'
 
       - name: Run Checkstyle
         run: mvn checkstyle:check
@@ -23,11 +23,11 @@ jobs:
   unit_tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Java 21
+      - name: Set up Java 21 (Adoptium Temurin)
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'adoptopenjdk'  # or another distribution if needed
+          distribution: 'temurin'
 
       - name: Checkout code
         uses: actions/checkout@v4
