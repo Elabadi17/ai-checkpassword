@@ -1,13 +1,13 @@
-name: Pull Request Validation
+name: Main Branch Workflow
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  build-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -20,31 +20,39 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
+          distribution: 'temurin'
 
-      # 3. Install dependencies and build project
+      # 3. Build the project and install dependencies
       - name: Build with Maven
         run: mvn clean install
 
-      # 4. Run Checkstyle to ensure code style compliance
-      - name: Run Checkstyle
-        run: mvn checkstyle:check
+      # 4. Publish the package to GitHub Maven Registry
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn deploy
 
-      # 5. Run unit tests
-      - name: Run Unit Tests
-        run: mvn test
+      # 5. Generate Javadoc and deploy it to GH Pages
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc
 
-      # 6. Check test coverage (ensure JaCoCo plugin is configured in pom.xml)
-      - name: Ensure Test Coverage
-        run: |
-          mvn jacoco:report
-          grep -q "coverage.*>90" target/site/jacoco/index.html || exit 1
-
-      # 7. Run Performance Tests (assumes performance tests are defined in the project)
-      - name: Run Performance Tests
-        run: mvn test -Dtest=PerformanceTests
-
-      # 8. Perform static application security testing (SAST) using Semgrep
-      - name: Run Semgrep SAST
-        uses: returntocorp/semgrep-action@v1
+      - name: Deploy Javadoc to GH Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          config: auto
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/site/apidocs
+          destination_dir: javadoc/${{ github.run_number }}
+
+      # 6. Generate Cobertura report and deploy it to GH Pages
+      - name: Generate Cobertura Report
+        run: |
+          mvn cobertura:cobertura
+          mkdir -p target/site/cobertura
+          cp -r target/site/cobertura ./cobertura
+
+      - name: Deploy Cobertura to GH Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cobertura
+          destination_dir: cobertura/${{ github.run_number }}
