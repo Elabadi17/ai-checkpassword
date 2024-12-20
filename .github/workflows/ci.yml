@@ -1,43 +1,50 @@
-name: CI/CD Pipeline
+name: Pull Request Validation
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
-  # 1. Static Analysis - Checkstyle
-  checkstyle:
+  build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
+
     steps:
-      - name: Set up Java 21 (Adoptium Temurin)
+      # 1. Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Set up Java environment
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: 17
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # 3. Install dependencies and build project
+      - name: Build with Maven
+        run: mvn clean install
 
-      - name: Verify repository structure
-        run: ls -l
-
+      # 4. Run Checkstyle to ensure code style compliance
       - name: Run Checkstyle
         run: mvn checkstyle:check
 
-  # 2. Unit Tests & Coverage (Jacoco)
-  unit_tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Java 21 (Adoptium Temurin)
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+      # 5. Run unit tests
+      - name: Run Unit Tests
+        run: mvn test
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Unit Test
+      # 6. Check test coverage (ensure JaCoCo plugin is configured in pom.xml)
+      - name: Ensure Test Coverage
         run: |
-          mvn test
+          mvn jacoco:report
+          grep -q "coverage.*>90" target/site/jacoco/index.html || exit 1
+
+      # 7. Run Performance Tests (assumes performance tests are defined in the project)
+      - name: Run Performance Tests
+        run: mvn test -Dtest=PerformanceTests
+
+      # 8. Perform static application security testing (SAST) using Semgrep
+      - name: Run Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
