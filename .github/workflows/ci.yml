@@ -1,4 +1,4 @@
-name: Main Branch Workflow
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,53 +6,38 @@ on:
       - main
 
 jobs:
-  build-deploy:
-    name: Build and Deploy
+  # 1. Static Analysis - Checkstyle
+  checkstyle:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # 2. Set up Java environment
-      - name: Set up JDK
+      - name: Set up Java 21 (Adoptium Temurin)
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: '21'
           distribution: 'temurin'
 
-      # 3. Build the project and install dependencies
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # 4. Publish the package to GitHub Maven Registry
-      - name: Publish to GitHub Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn deploy
+      - name: Verify repository structure
+        run: ls -l
 
-      # 5. Generate Javadoc and deploy it to GH Pages
-      - name: Generate Javadoc
-        run: mvn javadoc:javadoc
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
 
-      - name: Deploy Javadoc to GH Pages
-        uses: peaceiris/actions-gh-pages@v3
+  # 2. Unit Tests & Coverage
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java 21 (Adoptium Temurin)
+        uses: actions/setup-java@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/site/apidocs
-          destination_dir: javadoc/${{ github.run_number }}
+          java-version: '21'
+          distribution: 'temurin'
 
-      # 6. Generate Cobertura report and deploy it to GH Pages
-      - name: Generate Cobertura Report
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Unit Test
         run: |
-          mvn cobertura:cobertura
-          mkdir -p target/site/cobertura
-          cp -r target/site/cobertura ./cobertura
-
-      - name: Deploy Cobertura to GH Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./cobertura
-          destination_dir: cobertura/${{ github.run_number }}
+          mvn test
