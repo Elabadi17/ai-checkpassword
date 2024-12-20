@@ -58,7 +58,7 @@ jobs:
       - name: Deploy to GitHub Maven Registry
         run: mvn deploy -DskipTests
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
          GITHUB_USERNAME: ${{ github.actor }}
 
   # 4. Deploy Documentation using GitHub Pages
@@ -85,4 +85,4 @@ jobs:
           jekyll: false
           folder: target/site/apidocs
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
