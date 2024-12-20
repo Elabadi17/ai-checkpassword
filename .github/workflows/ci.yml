@@ -55,12 +55,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build and deploy to Maven
-        run: mvn deploy \
-           -Dgithub.owner=Elabadi17 \
-           -Dgithub.repo=ai-checkpassword
+      - name: Deploy to GitHub Maven Registry
+        run: mvn deploy -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_USERNAME: ${{ github.actor }}
 
   # 4. Deploy Documentation using GitHub Pages
   deploy_docs:
