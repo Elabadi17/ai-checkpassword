@@ -1,4 +1,3 @@
-#Wed Nov 20 15:06:34 CET 2024
-configuration*?=8AFD217CF3E9C5DC4F7C8CB5CC37F5AE11628BE2
-module-resource*?\:checkstyle-suppressions.xml=45542E7D34EEF17A7C990CC1C99A259500F302B5
-module-resource*?\:checkstyle-xpath-suppressions.xml=2EEC1C7171B0A75780976ACF096815A8D65791EA
+#Fri Dec 20 20:01:55 CET 2024
+C\:\\Users\\pc\\Documents\\ISIMA\\Revue\ de\ code\\TP1\\ai-checkpassword\\src\\main\\java\\org\\example\\AwesomePasswordChecker.java=1732108167790
+configuration*?=1755573BE9156222FD5CE2E01269009E0E6A008E
